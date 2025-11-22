@@ -1,0 +1,25 @@
+Name Of Project : FreelanGo 
+
+Descripton : 
+
+This Project made for Freelancer Job in Internet and it Have three users
+("User" , "Freelancer" , "Admin")
+
+Development Tools :-
+ 
+Frontend : 
+Backend : 
+
+	PHP Laravel v12
+
+
+
+--------------------------------------------------------------------------------------
+First : I install Fortify and make multi - Guard for the App 
+
+	1) Admin
+	2) Freelancer
+	3) User
+
+Secoend : I make a Freelango ERD and make Migration for the Tables
+Theard : I make a middleware for all users 
