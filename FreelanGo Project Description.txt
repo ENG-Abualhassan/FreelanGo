@@ -23,3 +23,5 @@ First : I install Fortify and make multi - Guard for the App
 
 Secoend : I make a Freelango ERD and make Migration for the Tables
 Theard : I make a middleware for all users 
+
+=> الزيادات بالفيديو رقم 3 موضوع الترجمة و التحقق عن طريق ملفات خارجية

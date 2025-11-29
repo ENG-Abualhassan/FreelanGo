@@ -32,28 +32,28 @@
 		</div>
 
 		<!-- <div class="col-md-3">
-								<label class="form-label">الرتبة</label>
-								<div class="input-icon-select">
-									<i class="bi bi-award"></i>
-									<select id="filter_role" class="form-select filter-input">
-										<option value="">الكل</option>
-										<option value="super-admin">Super Admin</option>
-										<option value="admin">Admin</option>
-									</select>
-								</div>
-							</div> -->
+										<label class="form-label">الرتبة</label>
+										<div class="input-icon-select">
+											<i class="bi bi-award"></i>
+											<select id="filter_role" class="form-select filter-input">
+												<option value="">الكل</option>
+												<option value="super-admin">Super Admin</option>
+												<option value="admin">Admin</option>
+											</select>
+										</div>
+									</div> -->
 
 		<!-- <div class="col-md-3">
-								<label class="form-label">الحالة</label>
-								<div class="input-icon-select">
-									<i class="bi bi-toggle-on"></i>
-									<select id="filter_status" class="form-select filter-input">
-										<option value="">الكل</option>
-										<option value="active">نشط</option>
-										<option value="inactive">غير نشط</option>
-									</select>
-								</div>
-							</div> -->
+										<label class="form-label">الحالة</label>
+										<div class="input-icon-select">
+											<i class="bi bi-toggle-on"></i>
+											<select id="filter_status" class="form-select filter-input">
+												<option value="">الكل</option>
+												<option value="active">نشط</option>
+												<option value="inactive">غير نشط</option>
+											</select>
+										</div>
+									</div> -->
 		<div class="col-md-2 mt-3 d-flex gap-2 justify-content-center align-items-center">
 			<button type="button" id="apply-filter" class="btn btn-primary w-100">
 				<i class="bi bi-funnel-fill"></i> فلتر
@@ -92,7 +92,7 @@
 	<div class="modal fade" id="create" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form id="createForm">
+				<form id="createForm" action="{{ route("admins.createAdmin") }}">
 					<div class="modal-header">
 						<h5 class="modal-title">انشاء مسؤول جديد</h5>
 						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -159,7 +159,8 @@
 	<div class="modal fade" id="delete" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
-				<form id="deleteForm">
+				<form id="deleteForm" action="{{ route('admins.deleteAdmin') }}">
+					<input type="hidden" name="_token" value="{{ csrf_token() }}">
 					<div class="modal-header">
 						<h5 class="modal-title">حذف مسؤول</h5>
 						<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -233,6 +234,15 @@
 				lengthMenu: [5, 10, 25, 50],
 			});
 			$('#apply-filter').on('click', function () {
+				let name = $('#filter_name').val().trim();
+				let email = $('#filter_email').val().trim();
+				if (name === '' && email === '') {
+					notyf.open({
+						type: 'warning',
+						message: 'يرجى ادخال الاسم او الايميل على الاقل لتتمكن من الفلترة'
+					});
+					return;
+				}
 				table.ajax.reload();
 			});
 			$('#reset-filter').on('click', function () {
@@ -241,35 +251,7 @@
 				table.search('').columns().search('').draw();
 			});
 		});
-		$('#createForm').on('submit', function (e) {
-			e.preventDefault();
-			let formData = {
-				name: $('#name').val().trim(),
-				email: $('#email').val().trim(),
-				password: $('#password').val(),
-				_token: '{{ csrf_token() }}',
-			};
-			$.ajax({
-				url: '{{ route("admins.createAdmin") }}',
-				type: 'post',
-				data: formData,
-				success: function () {
-					notyf.success('تم انشاء مسؤول بنجاح');
-					$('#create').modal('hide');
-					$('#dataTable').DataTable().ajax.reload();
-				},
-				error: function (xhr) {
-					$('.error-text').remove();
-					if (xhr.status === 422) {
-						let errors = xhr.responseJSON.errors;
-						$.each(errors, function (key, value) {
-							$('#' + key).after('<span class="error-text" style="color:red;">' + value[0] + '</span>');
-							$('#' + key).next('.error-text').fadeIn(300);
-						});
-					}
-				},
-			});
-		});
+
 		$(document).on('click', '.edit', function (e) {
 			let id = $(this).data('id');
 			$.get(`/admins/showAdminInfo/${id}`, function (data) {
@@ -321,81 +303,50 @@
 				$('#delete').modal('show');
 			});
 		});
-		$('#deleteForm').on('submit', function (e) {
-			e.preventDefault();
-			let formData = {
-				id: $('#delete_id').val(),
-				_token: '{{ csrf_token() }}'
-			};
-			$.ajax({
-				url: '{{ route('admins.deleteAdmin') }}',
-				type: 'post',
-				data: formData,
-				success: function (responce) {
-					if (responce.message) {
-						notyf.error(responce.message);
-						$('#delete').modal('hide');
-					} else {
-						notyf.success('تم حذف المسؤول بنجاح');
-						$('#delete').modal('hide');
-						$('#dataTable').DataTable().ajax.reload();
-					}
-				},
-				error: function (xhr) {
-					$('.error-text').remove();
-					if (xhr.status === 422) {
-						let errors = xhr.responseJSON.errors;
-						$.each(errors, function (key, value) {
-							$('#' + key).after('<span class="error-text" style="color:red;">' + value[0] + '</span>');
-							$('#' + key).next('.error-text').fadeIn(300);
-						});
-					}
-				},
-			});
-		});
+		
 		$(document).on('click', '.view', function (e) {
 			let id = $(this).data('id');
 			$.get(`/admins/showAdminInfo/${id}`, function (data) {
 				let admin = data.admin;
 				$('#view_id').val(admin.id);
 				$('#view-data').html(`
-									<div class="card shadow-sm border-0" style="border-radius: 18px;">
-										<div class="card-body text-center">
+											<div class="card shadow-sm border-0" style="border-radius: 18px;">
+												<div class="card-body text-center">
 
-											<!-- صورة البروفايل -->
-											<div class="mb-1">
-												<img src="{{ asset('assets/images/avatars/avatar-1.png') }}" 
-													 alt="Profile"
-													 class="rounded-circle shadow"
-													 style="width: 110px; height: 110px; object-fit: cover; border: 3px solid #eee;">
+													<!-- صورة البروفايل -->
+													<div class="mb-1">
+														<img src="{{ asset('assets/images/avatars/avatar-1.png') }}" 
+															 alt="Profile"
+															 class="rounded-circle shadow"
+															 style="width: 110px; height: 110px; object-fit: cover; border: 3px solid #eee;">
+													</div>
+													<div class="text-start px-3">
+
+														<div class="mb-3">
+															<label class="fw-bold text-muted">الاسم كامل:</label>
+															<div class="text-dark">${admin.name}</div>
+														</div>
+
+														<div class="mb-3">
+															<label class="fw-bold text-muted">البريد الإلكتروني:</label>
+															<div class="text-dark">${admin.email}</div>
+														</div>
+
+														<div class="mb-3">
+															<label class="fw-bold text-muted">تاريخ الانضمام:</label>
+															<div class="text-dark">${admin.created_at}</div>
+														</div>
+
+														<div class="mb-3">
+															<label class="fw-bold text-muted">تاريخ آخر تعديل:</label>
+															<div class="text-dark">${admin.updated_at}</div>
+														</div>
+
+													</div>
+
+												</div>
 											</div>
-											<div class="text-start px-3">
-
-												<div class="mb-3">
-													<label class="fw-bold text-muted">الاسم كامل:</label>
-													<div class="text-dark">${admin.name}</div>
-												</div>
-
-												<div class="mb-3">
-													<label class="fw-bold text-muted">البريد الإلكتروني:</label>
-													<div class="text-dark">${admin.email}</div>
-												</div>
-
-												<div class="mb-3">
-													<label class="fw-bold text-muted">تاريخ الانضمام:</label>
-													<div class="text-dark">${admin.created_at}</div>
-												</div>
-
-												<div class="mb-3">
-													<label class="fw-bold text-muted">تاريخ آخر تعديل:</label>
-													<div class="text-dark">${admin.updated_at}</div>
-												</div>
-
-											</div>
-
-										</div>
-									</div>
-								`);
+										`);
 				$('#view').modal('show');
 			});
 		});

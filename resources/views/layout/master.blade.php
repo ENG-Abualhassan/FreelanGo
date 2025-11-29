@@ -576,22 +576,90 @@
           background: '#FF4C4C',
           className: 'custom-error-toast',
           icon: {
-            className: 'fas fa-times-circle',
+            className: 'bi bi-x-circle-fill',
             tagName: 'i',
             color: 'white',
           }
         },
         {
           type: 'success',
-          background: '#089331ff', // بنفسجي فاتح جميل
+          background: '#089331ff',
           icon: {
-           className: 'fas fa-times-circle',
+            className: 'bi bi-check-circle-fill',
+            tagName: 'i',
+            color: 'white',
+          }
+        },
+        {
+          type: 'warning',
+          background: '#ffe600ff',
+          icon: {
+            className: 'bi bi-exclamation-triangle-fill',
             tagName: 'i',
             color: 'white',
           }
         }
       ]
     });
+  </script>
+  <script>
+    $('#createForm').on('submit', function (e) {
+      e.preventDefault();
+      let formData = new FormData(this);
+      $.ajax({
+        url: $(this).attr('action'),
+        type: 'post',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function () {
+          notyf.success('تمت العملية بنجاح');
+          $('#create').modal('hide');
+          $('#dataTable').DataTable().ajax.reload();
+        },
+        error: function (xhr) {
+          $('.error-text').remove();
+          if (xhr.status === 422) {
+            let errors = xhr.responseJSON.errors;
+            $.each(errors, function (key, value) {
+              $('#' + key).after('<span class="error-text" style="color:red;">' + value[0] + '</span>');
+              $('#' + key).next('.error-text').fadeIn(300);
+            });
+          }
+        },
+      });
+    });
+    $('#deleteForm').on('submit', function (e) {
+			e.preventDefault();
+			let formData = new FormData(this)
+			$.ajax({
+				url: $(this).attr('action'),
+				type: 'post',
+				data: formData,
+				processData: false,
+				contentType: false,
+				success: function (responce) {
+					if (responce.message) {
+						notyf.error(responce.message);
+						$('#delete').modal('hide');
+					} else {
+						notyf.success('تمت حذف بنجاح');
+						$('#delete').modal('hide');
+						$('#dataTable').DataTable().ajax.reload();
+					}
+				},
+				error: function (xhr) {
+					$('.error-text').remove();
+					if (xhr.status === 422) {
+						let errors = xhr.responseJSON.errors;
+						$.each(errors, function (key, value) {
+							$('#' + key).after('<span class="error-text" style="color:red;">' + value[0] + '</span>');
+							$('#' + key).next('.error-text').fadeIn(300);
+						});
+					}
+				},
+			});
+		});
   </script>
   @yield('js')
 

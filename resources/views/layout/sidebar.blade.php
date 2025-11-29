@@ -36,7 +36,7 @@
               <a href="javascript:;" class="has-arrow">
                 <div class="parent-icon"><i class="bi bi-people"></i>
                 </div>
-                <div class="menu-title">المستخدمين</div>
+                <div class="menu-title">ادارة المستخدمين</div>
               </a>
               <ul>
                 <li> <a href="{{ route("$guard.showAdmins") }}"><i class="bi bi-person-badge fs-5"></i>المسؤولون</a>
@@ -44,6 +44,19 @@
                 <li> <a href="{{ route("$guard.showFreelancers") }}"><i class="bi bi-laptop fs-5"></i>المستقلين</a>
                 </li>
                 <li> <a href="{{ route("$guard.showUsers") }}"><i class="bi bi-person fs-5"></i>العملاء</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="javascript:;" class="has-arrow">
+                <div class="parent-icon"><i class="bi bi-shield-lock"></i>
+                </div>
+                <div class="menu-title">ادارة الصلاحيات و الأدوار</div>
+              </a>
+              <ul>
+                <li> <a href="{{ route("$guard.permission.index") }}"><i class="bi bi-gear-fill fs-5"></i>الصلاحيات</a>
+                </li>
+                <li> <a href="{{ route("$guard.showUsers") }}"><i class="bi bi-bookmark-star-fill fs-5"></i>الأدوار</a>
                 </li>
               </ul>
             </li>
